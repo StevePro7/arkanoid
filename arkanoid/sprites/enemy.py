@@ -196,23 +196,29 @@ class Enemy(pygame.sprite.Sprite):
                             self._last_contact = self._update_count
                             self._direction = self._calc_direction_collision(
                                 sprites_collided)
-                        elif self._update_count > self._last_contact + 30:
-                            # Last contact not made for past 30 updates, so
-                            # recalculate direction using free movement
-                            # algorithm.
-                            if not self._duration:
-                                # The duration of the previous direction of
-                                # free movement has elapsed, so calculate a new
-                                # direction with a new duration.
-                                self._direction = self._calc_direction()
-                                self._duration = (
-                                    self._update_count + random.choice(
-                                        range(MIN_DURATION, MAX_DURATION)))
-                            elif self._update_count >= self._duration:
-                                # We've reached the maximum duration in the
-                                # given direction, so reset in order for the
-                                # direction to be modified next cycle.
-                                self._duration = 0
+                        else:
+                            LOG.info('not collided DIRX : %f', self._direction)
+                            if self._update_count > self._last_contact + 30:
+                                LOG.warn('update: %d > contact: %d', self._update_count, (self._last_contact + 30))
+
+                                # Last contact not made for past 30 updates, so
+                                # recalculate direction using free movement
+                                # algorithm.
+                                if not self._duration:
+                                    # The duration of the previous direction of
+                                    # free movement has elapsed, so calculate a new
+                                    # direction with a new duration.
+                                    self._direction = self._calc_direction()
+
+                                    LOG.error('Duration : %f  direction : %f', self._duration, self._direction)
+                                    self._duration = (
+                                        self._update_count + random.choice(
+                                            range(MIN_DURATION, MAX_DURATION)))
+                                elif self._update_count >= self._duration:
+                                    # We've reached the maximum duration in the
+                                    # given direction, so reset in order for the
+                                    # direction to be modified next cycle.
+                                    self._duration = 0
 
                         #####################################################
                 else:
@@ -222,6 +228,7 @@ class Enemy(pygame.sprite.Sprite):
                         self._on_destroyed_called = True
 
         self._update_count += 1
+        bob = 17
 
     def _explode(self):
         """Run the explosion animation."""
@@ -235,8 +242,12 @@ class Enemy(pygame.sprite.Sprite):
             self._on_destroyed(self)
 
     def _calc_new_position(self):
-        offset_x = SPEED * math.cos(self._direction)
-        offset_y = SPEED * math.sin(self._direction)
+        valueX = math.cos(self._direction)
+        valueY = math.sin(self._direction)
+        offset_x = SPEED * valueX
+        offset_y = SPEED * valueY
+        # offset_x = SPEED * math.cos(self._direction)
+        # offset_y = SPEED * math.sin(self._direction)
 
         return self.rect.move(offset_x, offset_y)
 
@@ -315,9 +326,15 @@ class Enemy(pygame.sprite.Sprite):
         # No collision, so calculate the direction towards the paddle
         # but with some randomness applied.
         paddle_x, paddle_y = self._paddle.rect.center
-        direction = math.atan2(paddle_y - self.rect.y,
-                               paddle_x - self.rect.x)
+        deltaX = paddle_x - self.rect.x
+        deltaY = paddle_y - self.rect.y
 
+        direction = math.atan2(deltaY, deltaX)
+
+        # direction = math.atan2(paddle_y - self.rect.y,
+        #                        paddle_x - self.rect.x)
+
+        # LOG.info('%d, %d = %f', deltaX, deltaY, direction)
         direction += random.uniform(-RANDOM_RANGE, RANDOM_RANGE)
 
         return direction

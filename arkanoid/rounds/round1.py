@@ -31,11 +31,12 @@ class Round1(BaseRound):
         self.name = 'Round 1'
         self.next_round = Round2
         self.enemy_type = EnemyType.cone
-        self.num_enemies = 3
+        self.num_enemies = 2
 
     def can_release_enemies(self):
         """Release the enemies when 25% of the bricks have been destroyed."""
-        return self._bricks_destroyed >= len(self.bricks) // 4
+        # return self._bricks_destroyed >= len(self.bricks) // 4
+        return True
 
     def _get_background_colour(self):
         return BLUE

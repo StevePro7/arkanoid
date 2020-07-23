@@ -29,7 +29,7 @@ class Round5(BaseRound):
 
         self.name = 'Round 5'
         self.enemy_type = EnemyType.cone
-        self.num_enemies = 3
+        self.num_enemies = 1
 
     def can_release_enemies(self):
         """Release the enemies right at the start."""

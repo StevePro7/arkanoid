@@ -318,6 +318,7 @@ class StartScreen:
                    color=(128, 128, 128))
 
         self._display_count += 1
+        self._on_start(5)
 
     def hide(self):
         """Hide the start screen and unregister event listeners."""
@@ -591,11 +592,11 @@ class Game:
             self.balls.remove(ball)
             self.sprites.remove(ball)
             ball.visible = False
-        else:
+        # else:
             # This ball is the last in play, so transition to the
             # BallOffScreenState which handles end of life.
-            if not isinstance(self.state, BallOffScreenState):
-                self.state = BallOffScreenState(self)
+            # if not isinstance(self.state, BallOffScreenState):
+                # self.state = BallOffScreenState(self)
 
     def _create_event_handlers(self):
         """Create the event handlers for paddle movement."""

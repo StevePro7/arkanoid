@@ -5,7 +5,7 @@ from arkanoid.game import Arkanoid
 
 logging.basicConfig()
 LOG = logging.getLogger('arkanoid')
-LOG.setLevel(logging.DEBUG)
+LOG.setLevel(logging.INFO)
 
 
 if __name__ == '__main__':

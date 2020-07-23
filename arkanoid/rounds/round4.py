@@ -33,7 +33,7 @@ class Round4(BaseRound):
         self.name = 'Round 4'
         self.next_round = Round5
         self.enemy_type = EnemyType.cube
-        self.num_enemies = 3
+        self.num_enemies = 1
 
     def can_release_enemies(self):
         """Release the enemies right at the start."""
