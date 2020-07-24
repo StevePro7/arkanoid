@@ -276,10 +276,20 @@ class Enemy(pygame.sprite.Sprite):
 
         for rect in rects:
             # Work out which of our sides are in contact.
-            cleft = cleft or left.colliderect(rect)
-            cright = cright or right.colliderect(rect)
-            ctop = ctop or top.colliderect(rect)
-            cbottom = cbottom or bottom.colliderect(rect)
+            leftColl = left.colliderect(rect)
+            rghtColl = right.colliderect(rect)
+            topXcoll = top.colliderect(rect)
+            bottColl = bottom.colliderect(rect)
+
+            cleft = cleft or leftColl
+            cright = cright or rghtColl
+            ctop = ctop or topXcoll
+            cbottom = cbottom or bottColl
+
+            # cleft = cleft or left.colliderect(rect)
+            # cright = cright or right.colliderect(rect)
+            # ctop = ctop or top.colliderect(rect)
+            # cbottom = cbottom or bottom.colliderect(rect)
 
         direction = self._direction
 
