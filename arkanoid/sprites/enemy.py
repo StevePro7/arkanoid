@@ -219,7 +219,7 @@ class Enemy(pygame.sprite.Sprite):
             new_deg = ((new_direction) * 180.0 / 3.14159265358979323846)
             #LOG.info('Update %d  OLD dirX %f   NEW dirX %f', self._update_count, old_direction, new_direction)
             # if old_deg < 0 or new_deg < 0 or old_deg > 360 or new_deg > 360:
-            LOG.info('Update %d  OLD dirX %f   NEW dirX %f', self._update_count, old_deg, new_deg)
+            #LOG.info('Update %d  OLD dirX %f   NEW dirX %f', self._update_count, old_deg, new_deg)
             self._update_count += 0
 
         self._update_count += 1
@@ -334,6 +334,14 @@ class Enemy(pygame.sprite.Sprite):
         deltaY = paddle_y - self.rect.y
 
         direction = math.atan2(deltaY, deltaX)
+        dir1 = math.atan2(deltaY, deltaX)
+        dir2 = self.ApproxAtan2(deltaY, deltaX)
+        if dir1 != dir2:
+            diff = abs(dir1 - dir2)
+
+            #LOG.info('DIFF: %f  dir1: %f   dir2: %f', diff, dir1, dir2)
+            LOG.info('%d,%d,%f,%f,%f', deltaX, deltaY, dir1, dir2, diff)
+            dir2 = 7
 
         # direction = math.atan2(paddle_y - self.rect.y,
         #                        paddle_x - self.rect.x)
@@ -356,3 +364,43 @@ class Enemy(pygame.sprite.Sprite):
         self._on_destroyed_called = False
         self.visible = True
         self.freeze = False
+
+
+# https://www.dsprelated.com/showarticle/1052.php
+    def ApproxAtan(self, z):
+        n1 = 0.97239411
+        n2 = -0.19194795
+        return (n1 + n2 * z * z) * z
+
+    def ApproxAtan2(self, y, x):
+        if x != 0.0:
+            absX = abs(x)
+            absY = abs(y)
+            if absX > absY:
+                z = y / x
+                if x > 0.0:
+                    #  atan2(y, x) = atan(y / x) if x > 0
+                    return self.ApproxAtan(z)
+                elif y >= 0.0:
+                    # atan2(y,x) = atan(y/x) + PI if x < 0, y >= 0
+                    return self.ApproxAtan(z) + math.pi
+                else:
+                    # atan2(y,x) = atan(y/x) - PI if x < 0, y < 0
+                    return self.ApproxAtan(z) - math.pi
+            else:
+                # Use property atan(y/x) = PI/2 - atan(x/y) if |y/x| > 1.
+                z = x / y
+                if y > 0.0:
+                    # atan2(y,x) = PI/2 - atan(x/y) if |y/x| > 1, y > 0
+                    return -self.ApproxAtan(z) + HALF_PI
+                else:
+                    # atan2(y,x) = -PI/2 - atan(x/y) if |y/x| > 1, y < 0
+                    return -self.ApproxAtan(z) - HALF_PI
+        else:
+            if y > 0.0:
+                # x = 0, y > 0
+                return HALF_PI
+            elif y < 0.0:
+                # x = 0, y < 0
+                return -HALF_PI
+        return 0.0
