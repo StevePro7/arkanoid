@@ -158,6 +158,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self):
         """Update the enemy's position, handling any collisions."""
+        old_direction = self._direction
         if self._explode_animation:
             self._explode()
         else:
@@ -184,40 +185,25 @@ class Enemy(pygame.sprite.Sprite):
                             self,
                             visible_sprites, None)
 
-                        # The following code could be pulled into a separate
-                        # strategy class which could be passed to the enemy
-                        # when it is initialised. This could act as the default
-                        # movement behaviour, and would allow rounds to
-                        # inject their own strategy classes when they wanted
-                        # their own round specific movement behaviour.
-                        #####################################################
 
                         if sprites_collided:
                             self._last_contact = self._update_count
-                            self._direction = self._calc_direction_collision(
-                                sprites_collided)
+                            # next direction will be up / down / left / right depending on collision
+                            self._direction = self._calc_direction_collision(sprites_collided)
                         else:
-                            LOG.info('not collided DIRX : %f', self._direction)
+                            # LOG.info('not collided DIRX : %f', self._direction)
                             if self._update_count > self._last_contact + 30:
-                                LOG.warn('update: %d > contact: %d', self._update_count, (self._last_contact + 30))
+                                # LOG.warn('update: %d > contact: %d', self._update_count, (self._last_contact + 30))
 
-                                # Last contact not made for past 30 updates, so
-                                # recalculate direction using free movement
-                                # algorithm.
                                 if not self._duration:
-                                    # The duration of the previous direction of
-                                    # free movement has elapsed, so calculate a new
-                                    # direction with a new duration.
                                     self._direction = self._calc_direction()
 
-                                    LOG.error('Duration : %f  direction : %f', self._duration, self._direction)
+                                    # LOG.error('Duration : %f  direction : %f', self._duration, self._direction)
                                     self._duration = (
                                         self._update_count + random.choice(
                                             range(MIN_DURATION, MAX_DURATION)))
                                 elif self._update_count >= self._duration:
-                                    # We've reached the maximum duration in the
-                                    # given direction, so reset in order for the
-                                    # direction to be modified next cycle.
+
                                     self._duration = 0
 
                         #####################################################
@@ -227,8 +213,16 @@ class Enemy(pygame.sprite.Sprite):
                         self._on_destroyed(self)
                         self._on_destroyed_called = True
 
+        new_direction = self._direction
+        if old_direction != new_direction:
+            old_deg = ((old_direction) * 180.0 / 3.14159265358979323846)
+            new_deg = ((new_direction) * 180.0 / 3.14159265358979323846)
+            #LOG.info('Update %d  OLD dirX %f   NEW dirX %f', self._update_count, old_direction, new_direction)
+            # if old_deg < 0 or new_deg < 0 or old_deg > 360 or new_deg > 360:
+            LOG.info('Update %d  OLD dirX %f   NEW dirX %f', self._update_count, old_deg, new_deg)
+            self._update_count += 0
+
         self._update_count += 1
-        bob = 17
 
     def _explode(self):
         """Run the explosion animation."""
